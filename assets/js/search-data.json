@@ -73,7 +73,9 @@
   
 
   
-      ,"page3": {
+
+  
+      ,"page4": {
           "title": "Sample",
           "content": "hello world . hello | hello | hello | .",
           "url": "https://lic-deep.github.io/testcolabblog2/sample/",
@@ -103,7 +105,7 @@
   
 
   
-      ,"page11": {
+      ,"page12": {
           "title": "",
           "content": "Sitemap: {{ “sitemap.xml” | absolute_url }} | .",
           "url": "https://lic-deep.github.io/testcolabblog2/robots.txt",
