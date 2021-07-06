@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 생성하기 | Teacher Forcing Student</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 생성하기" />
+<meta name="author" content="In Chan" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Pytorch Tutorial 따라서 코드 돌려보며, 내용 확인" />
+<meta property="og:description" content="Pytorch Tutorial 따라서 코드 돌려보며, 내용 확인" />
+<link rel="canonical" href="https://lic-deep.github.io/testcolabblog2/jupyter/deep%20learning/2021/07/06/RNN-Name-Generation.html" />
+<meta property="og:url" content="https://lic-deep.github.io/testcolabblog2/jupyter/deep%20learning/2021/07/06/RNN-Name-Generation.html" />
+<meta property="og:site_name" content="Teacher Forcing Student" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-07-06T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"Pytorch Tutorial 따라서 코드 돌려보며, 내용 확인","url":"https://lic-deep.github.io/testcolabblog2/jupyter/deep%20learning/2021/07/06/RNN-Name-Generation.html","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://lic-deep.github.io/testcolabblog2/jupyter/deep%20learning/2021/07/06/RNN-Name-Generation.html"},"headline":"기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 생성하기","dateModified":"2021-07-06T00:00:00-05:00","datePublished":"2021-07-06T00:00:00-05:00","author":{"@type":"Person","name":"In Chan"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/testcolabblog2/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://lic-deep.github.io/testcolabblog2/feed.xml" title="Teacher Forcing Student" /><link rel="shortcut icon" type="image/x-icon" href="/testcolabblog2/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/testcolabblog2/">Teacher Forcing Student</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/testcolabblog2/about/">About Me</a><a class="page-link" href="/testcolabblog2/gitInfo/">gitInfo</a><a class="page-link" href="/testcolabblog2/sample/">Sample</a><a class="page-link" href="/testcolabblog2/search/">Search</a><a class="page-link" href="/testcolabblog2/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 생성하기</h1><p class="page-description">Pytorch Tutorial 따라서 코드 돌려보며, 내용 확인</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-07-06T00:00:00-05:00" itemprop="datePublished">
+        Jul 6, 2021
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">In Chan</span></span>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      5 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/testcolabblog2/categories/#jupyter">jupyter</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/testcolabblog2/categories/#deep learning">deep learning</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/Lic-Deep/testcolabblog2/tree/master/_notebooks/2021-07-06-RNN Name Generation.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/testcolabblog2/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/Lic-Deep/testcolabblog2/master?filepath=_notebooks%2F2021-07-06-RNN+Name+Generation.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/testcolabblog2/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/Lic-Deep/testcolabblog2/blob/master/_notebooks/2021-07-06-RNN Name Generation.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/testcolabblog2/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#기초부터-시작하는-NLP:-문자-단위-RNN으로-이름-생성하기">기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 생성하기 </a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#1.-데이터준비">1. 데이터준비 </a></li>
+<li class="toc-entry toc-h2"><a href="#2.-네트워크-생성">2. 네트워크 생성 </a></li>
+<li class="toc-entry toc-h2"><a href="#3.-학습">3. 학습 </a></li>
+<li class="toc-entry toc-h2"><a href="#4.-네트워크-학습">4. 네트워크 학습 </a></li>
+<li class="toc-entry toc-h2"><a href="#4.-결과-도식화">4. 결과 도식화 </a></li>
+<li class="toc-entry toc-h2"><a href="#5.-네트워크-샘플링">5. 네트워크 샘플링 </a></li>
+</ul>
+</li>
+</ul><!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2021-07-06-RNN Name Generation.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="기초부터-시작하는-NLP:-문자-단위-RNN으로-이름-생성하기">
+<a class="anchor" href="#%EA%B8%B0%EC%B4%88%EB%B6%80%ED%84%B0-%EC%8B%9C%EC%9E%91%ED%95%98%EB%8A%94-NLP:-%EB%AC%B8%EC%9E%90-%EB%8B%A8%EC%9C%84-RNN%EC%9C%BC%EB%A1%9C-%EC%9D%B4%EB%A6%84-%EC%83%9D%EC%84%B1%ED%95%98%EA%B8%B0" aria-hidden="true"><span class="octicon octicon-link"></span></a>기초부터 시작하는 NLP: 문자-단위 RNN으로 이름 생성하기<a class="anchor-link" href="#%EA%B8%B0%EC%B4%88%EB%B6%80%ED%84%B0-%EC%8B%9C%EC%9E%91%ED%95%98%EB%8A%94-NLP:-%EB%AC%B8%EC%9E%90-%EB%8B%A8%EC%9C%84-RNN%EC%9C%BC%EB%A1%9C-%EC%9D%B4%EB%A6%84-%EC%83%9D%EC%84%B1%ED%95%98%EA%B8%B0"> </a>
+</h1>
+<hr>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="1.-데이터준비">
+<a class="anchor" href="#1.-%EB%8D%B0%EC%9D%B4%ED%84%B0%EC%A4%80%EB%B9%84" aria-hidden="true"><span class="octicon octicon-link"></span></a>1. 데이터준비<a class="anchor-link" href="#1.-%EB%8D%B0%EC%9D%B4%ED%84%B0%EC%A4%80%EB%B9%84"> </a>
+</h2>
+<ul>
+<li>txt 파일을 찾아서, 어레이로 분리하고, ASCII로 변환하고, 딕셔너리 자료형 생성</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="nb">open</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">unicodedata</span>
+<span class="kn">import</span> <span class="nn">string</span>
+
+<span class="n">all_letters</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span> <span class="o">+</span> <span class="s2">" .,;'-"</span>
+<span class="n">n_letters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_letters</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="c1"># EOS(end of sentence) 기호 추가</span>
+
+<span class="k">def</span> <span class="nf">findFiles</span><span class="p">(</span><span class="n">path</span><span class="p">):</span> <span class="k">return</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+<span class="c1"># 유니코드 문자열을 ASCII로 변환, https://stackoverflow.com/a/518232/2809427</span>
+<span class="k">def</span> <span class="nf">unicodeToAscii</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s1">''</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s1">'NFD'</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">category</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">'Mn'</span>
+        <span class="ow">and</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">all_letters</span>
+    <span class="p">)</span>
+
+<span class="c1"># 파일을 읽고 줄 단위로 분리</span>
+<span class="k">def</span> <span class="nf">readLines</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">some_file</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">unicodeToAscii</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">some_file</span><span class="p">]</span>
+
+<span class="c1"># 각 언어의 이름 목록인 category_lines 사전 생성</span>
+<span class="n">category_lines</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">all_categories</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">findFiles</span><span class="p">(</span><span class="s1">'data/names/*.txt'</span><span class="p">):</span>
+    <span class="n">category</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">all_categories</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">readLines</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">category_lines</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="o">=</span> <span class="n">lines</span>
+
+<span class="n">n_categories</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_categories</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">n_categories</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">'Data not found. Make sure that you downloaded data '</span>
+        <span class="s1">'from https://download.pytorch.org/tutorial/data.zip and extract it to '</span>
+        <span class="s1">'the current directory.'</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">'# categories:'</span><span class="p">,</span> <span class="n">n_categories</span><span class="p">,</span> <span class="n">all_categories</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">unicodeToAscii</span><span class="p">(</span><span class="s2">"O'Néàl"</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre># categories: 18 ['Arabic', 'Chinese', 'Czech', 'Dutch', 'English', 'French', 'German', 'Greek', 'Irish', 'Italian', 'Japanese', 'Korean', 'Polish', 'Portuguese', 'Russian', 'Scottish', 'Spanish', 'Vietnamese']
+O'Neal
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="2.-네트워크-생성">
+<a class="anchor" href="#2.-%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-%EC%83%9D%EC%84%B1" aria-hidden="true"><span class="octicon octicon-link"></span></a>2. 네트워크 생성<a class="anchor-link" href="#2.-%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-%EC%83%9D%EC%84%B1"> </a>
+</h2>
+<ul>
+<li>더 나은 성능을 위해 선형 레이어(o2o layer) 추가, Drop out 추가</li>
+</ul>
+<p><img src="https://i.imgur.com/jzVrf7f.png" alt="image"></p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+
+<span class="k">class</span> <span class="nc">RNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RNN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span> <span class="o">=</span> <span class="n">hidden_size</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">i2h</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_categories</span> <span class="o">+</span> <span class="n">input_size</span> <span class="o">+</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i2o</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_categories</span> <span class="o">+</span> <span class="n">input_size</span> <span class="o">+</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">o2o</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_size</span> <span class="o">+</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">output_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">softmax</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LogSoftmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">hidden</span><span class="p">):</span>
+        <span class="n">input_combined</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">category</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">hidden</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">hidden</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2h</span><span class="p">(</span><span class="n">input_combined</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i2o</span><span class="p">(</span><span class="n">input_combined</span><span class="p">)</span>
+        <span class="n">output_combined</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">hidden</span><span class="p">,</span> <span class="n">output</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">o2o</span><span class="p">(</span><span class="n">output_combined</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span>
+
+    <span class="k">def</span> <span class="nf">initHidden</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="3.-학습">
+<a class="anchor" href="#3.-%ED%95%99%EC%8A%B5" aria-hidden="true"><span class="octicon octicon-link"></span></a>3. 학습<a class="anchor-link" href="#3.-%ED%95%99%EC%8A%B5"> </a>
+</h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+
+<span class="c1"># 목록에서 무작위 아이템 반환</span>
+<span class="k">def</span> <span class="nf">randomChoice</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">l</span><span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
+
+<span class="c1"># 임의의 category 및 그 category에서 무작위 줄(이름) 얻기</span>
+<span class="c1"># 실행 예시  = ('German', 'Brauer')</span>
+<span class="k">def</span> <span class="nf">randomTrainingPair</span><span class="p">():</span>
+    <span class="n">category</span> <span class="o">=</span> <span class="n">randomChoice</span><span class="p">(</span><span class="n">all_categories</span><span class="p">)</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="n">randomChoice</span><span class="p">(</span><span class="n">category_lines</span><span class="p">[</span><span class="n">category</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">category</span><span class="p">,</span> <span class="n">line</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>각 스텝마다(즉, 학습 단어의 각 문자 마다) 네트워크의 입력 = (언어, 현재 문자, 히든스테이트) , 출력 = (다음 문자, 다음 히든스테이트)</li>
+<li>따라서, 각 학습 세트마다 언어, 입력 문자의 세트, 출력/목표 문자의 세트가 필요</li>
+<li>각 시간 단계마다 현재 문자에서 다음 문자를 예측하기 때문에, 문자 쌍은 한 줄(하나의 이름)에서 연속된 문자 그룹</li>
+<li>예를 들어 "ABCD<eos>" 는 (“A”, “B”), (“B”, “C”), (“C”, “D”), (“D”, “EOS”) 로 생성&lt;/li&gt;
+&lt;/ul&gt;
+<p><img src="https://i.imgur.com/JH58tXY.png" alt="image2"></p>
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">categoryTensor</span><span class="p">(</span><span class="n">category</span><span class="p">):</span>
+    <span class="n">li</span> <span class="o">=</span> <span class="n">all_categories</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+    <span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_categories</span><span class="p">)</span>
+    <span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">li</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">tensor</span>
+
+<span class="c1"># 입력을 위한 처음부터 마지막 문자(EOS 제외)까지의  One-hot 행렬</span>
+<span class="c1"># Data</span>
+<span class="k">def</span> <span class="nf">inputTensor</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+    <span class="n">tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_letters</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">li</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)):</span>
+        <span class="n">letter</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">li</span><span class="p">]</span>
+        <span class="n">tensor</span><span class="p">[</span><span class="n">li</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">all_letters</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">letter</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">tensor</span>
+
+<span class="c1"># 목표를 위한 두번째 문자 부터 마지막(EOS) 까지의 LongTensor</span>
+<span class="c1"># Label</span>
+<span class="k">def</span> <span class="nf">targetTensor</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+    <span class="n">letter_indexes</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_letters</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">li</span><span class="p">])</span> <span class="k">for</span> <span class="n">li</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">))]</span>
+    <span class="n">letter_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n_letters</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># EOS</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">(</span><span class="n">letter_indexes</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>학습에서 편의를 위해 무작위로 데이터를 가져오고, input과 output의 형태로 바꾸어주는 함수</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">randomTrainingExample</span><span class="p">():</span>
+    <span class="n">category</span><span class="p">,</span> <span class="n">line</span> <span class="o">=</span> <span class="n">randomTrainingPair</span><span class="p">()</span>
+    <span class="n">category_tensor</span> <span class="o">=</span> <span class="n">categoryTensor</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+    <span class="n">input_line_tensor</span> <span class="o">=</span> <span class="n">inputTensor</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="n">target_line_tensor</span> <span class="o">=</span> <span class="n">targetTensor</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">category_tensor</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">,</span> <span class="n">target_line_tensor</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="4.-네트워크-학습">
+<a class="anchor" href="#4.-%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-%ED%95%99%EC%8A%B5" aria-hidden="true"><span class="octicon octicon-link"></span></a>4. 네트워크 학습<a class="anchor-link" href="#4.-%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-%ED%95%99%EC%8A%B5"> </a>
+</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>마지막 출력만 사용하는 분류와는 달리, 모든 타임 스텝에서 예측을 진행하므로, 각 단계에서의 손실을 계산해줘야함</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">NLLLoss</span><span class="p">()</span>
+
+<span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.0005</span>
+
+<span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">category_tensor</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">,</span> <span class="n">target_line_tensor</span><span class="p">):</span>
+    <span class="n">target_line_tensor</span><span class="o">.</span><span class="n">unsqueeze_</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="o">.</span><span class="n">initHidden</span><span class="p">()</span> <span class="c1"># initialization</span>
+
+    <span class="n">rnn</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span> 
+
+    <span class="n">loss</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">input_line_tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
+        <span class="c1"># 하나의 문자씩 들어감</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">category_tensor</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hidden</span><span class="p">)</span> 
+        <span class="c1"># 각 타임 스텝에 대한 Loss 계산</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> 
+        <span class="n">loss</span> <span class="o">+=</span> <span class="n">l</span>
+
+    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span> <span class="c1"># Loss 역전파</span>
+
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">rnn</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">add_</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=-</span><span class="n">learning_rate</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">/</span> <span class="n">input_line_tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="c1"># 학습에 걸리는 시간을 추적하기 위한 것</span>
+<span class="k">def</span> <span class="nf">timeSince</span><span class="p">(</span><span class="n">since</span><span class="p">):</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">since</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">s</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">-=</span> <span class="n">m</span> <span class="o">*</span> <span class="mi">60</span>
+    <span class="k">return</span> <span class="s1">'</span><span class="si">%d</span><span class="s1">m </span><span class="si">%d</span><span class="s1">s'</span> <span class="o">%</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">rnn</span> <span class="o">=</span> <span class="n">RNN</span><span class="p">(</span><span class="n">n_letters</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="n">n_letters</span><span class="p">)</span> 
+
+<span class="n">n_iters</span> <span class="o">=</span> <span class="mi">100000</span>
+<span class="n">print_every</span> <span class="o">=</span> <span class="mi">5000</span>
+<span class="n">plot_every</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">all_losses</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">total_loss</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># plot_every 마다 초기화</span>
+
+<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="nb">iter</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_iters</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">output</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="n">train</span><span class="p">(</span><span class="o">*</span><span class="n">randomTrainingExample</span><span class="p">())</span>
+    <span class="n">total_loss</span> <span class="o">+=</span> <span class="n">loss</span>
+
+    <span class="k">if</span> <span class="nb">iter</span> <span class="o">%</span> <span class="n">print_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="si">%s</span><span class="s1"> (</span><span class="si">%d</span><span class="s1"> </span><span class="si">%d%%</span><span class="s1">) </span><span class="si">%.4f</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">timeSince</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="nb">iter</span><span class="p">,</span> <span class="nb">iter</span> <span class="o">/</span> <span class="n">n_iters</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="n">loss</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="nb">iter</span> <span class="o">%</span> <span class="n">plot_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">all_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">total_loss</span> <span class="o">/</span> <span class="n">plot_every</span><span class="p">)</span>
+        <span class="n">total_loss</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>0m 22s (5000 5%) 2.3946
+0m 44s (10000 10%) 3.4316
+1m 7s (15000 15%) 2.4484
+1m 29s (20000 20%) 3.3045
+1m 51s (25000 25%) 2.7333
+2m 13s (30000 30%) 2.7747
+2m 35s (35000 35%) 2.9738
+2m 57s (40000 40%) 2.6746
+3m 19s (45000 45%) 2.2482
+3m 40s (50000 50%) 2.3516
+4m 1s (55000 55%) 2.0257
+4m 22s (60000 60%) 2.5526
+4m 43s (65000 65%) 2.1610
+5m 4s (70000 70%) 2.7014
+5m 25s (75000 75%) 1.2569
+5m 46s (80000 80%) 2.7089
+6m 7s (85000 85%) 4.1362
+6m 28s (90000 90%) 2.6643
+6m 49s (95000 95%) 3.3536
+7m 10s (100000 100%) 2.3982
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="4.-결과-도식화">
+<a class="anchor" href="#4.-%EA%B2%B0%EA%B3%BC-%EB%8F%84%EC%8B%9D%ED%99%94" aria-hidden="true"><span class="octicon octicon-link"></span></a>4. 결과 도식화<a class="anchor-link" href="#4.-%EA%B2%B0%EA%B3%BC-%EB%8F%84%EC%8B%9D%ED%99%94"> </a>
+</h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">all_losses</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&lt;matplotlib.lines.Line2D at 0x1fdaf8cf6c8&gt;]</pre>
+</div>
+
+</div>
+
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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">
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="5.-네트워크-샘플링">
+<a class="anchor" href="#5.-%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-%EC%83%98%ED%94%8C%EB%A7%81" aria-hidden="true"><span class="octicon octicon-link"></span></a>5. 네트워크 샘플링<a class="anchor-link" href="#5.-%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-%EC%83%98%ED%94%8C%EB%A7%81"> </a>
+</h2>
+<ul>
+<li>입력 : (카테고리, 시작문자, 히든 스테이트)</li>
+<li>시작 문자로 output_name 문자열 생성</li>
+<li>최대 출력 길이까지<ul>
+<li>시작 문자를 네트워크에 전달</li>
+<li>다음 문자와 다음 히든 스테이트를 얻음</li>
+<li>EOS면 Stop, 그 외의 문자라면 output_name에 추가하고 계속</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">max_length</span> <span class="o">=</span> <span class="mi">20</span>
+
+<span class="c1"># 카테고리와 시작 문자로 부터 샘플링 하기</span>
+<span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">start_letter</span><span class="o">=</span><span class="s1">'A'</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>  <span class="c1"># 샘플링에서 히스토리를 추적할 필요 없음</span>
+        <span class="n">category_tensor</span> <span class="o">=</span> <span class="n">categoryTensor</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+        <span class="c1"># inputTensor : 입력을 위해 문자를 One-Hot 백터로 인코딩하는 함수</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="n">inputTensor</span><span class="p">(</span><span class="n">start_letter</span><span class="p">)</span> 
+        <span class="c1"># 맨 처음 Time Step에 들어가기 전에만 parameter 초기화를 해줌</span>
+        <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="o">.</span><span class="n">initHidden</span><span class="p">()</span> 
+
+        <span class="n">output_name</span> <span class="o">=</span> <span class="n">start_letter</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_length</span><span class="p">):</span>
+            <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">category_tensor</span><span class="p">,</span> <span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">hidden</span><span class="p">)</span>
+            <span class="c1"># 텐서의 가장 큰 값 및 주소 , 즉 topv은 max값, topi는 argmax 값</span>
+            <span class="n">topv</span><span class="p">,</span> <span class="n">topi</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> 
+            <span class="c1"># 모델에서 예측한 문자의 index</span>
+            <span class="n">topi</span> <span class="o">=</span> <span class="n">topi</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> 
+            <span class="k">if</span> <span class="n">topi</span> <span class="o">==</span> <span class="n">n_letters</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span> <span class="c1">## EOS면 종료</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">letter</span> <span class="o">=</span> <span class="n">all_letters</span><span class="p">[</span><span class="n">topi</span><span class="p">]</span> <span class="c1"># output name에 문자 추가</span>
+                <span class="n">output_name</span> <span class="o">+=</span> <span class="n">letter</span>
+            <span class="nb">input</span> <span class="o">=</span> <span class="n">inputTensor</span><span class="p">(</span><span class="n">letter</span><span class="p">)</span> <span class="c1"># 다음 time step의 인풋으로 넣어줌 </span>
+
+        <span class="k">return</span> <span class="n">output_name</span>
+
+<span class="c1"># 하나의 카테고리와 여러 시작 문자들로 여러 개의 샘플 얻기</span>
+<span class="k">def</span> <span class="nf">samples</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">start_letters</span><span class="o">=</span><span class="s1">'ABC'</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">start_letter</span> <span class="ow">in</span> <span class="n">start_letters</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">sample</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">start_letter</span><span class="p">))</span>
+
+<span class="n">samples</span><span class="p">(</span><span class="s1">'Russian'</span><span class="p">,</span> <span class="s1">'RUS'</span><span class="p">)</span>
+
+<span class="n">samples</span><span class="p">(</span><span class="s1">'German'</span><span class="p">,</span> <span class="s1">'GER'</span><span class="p">)</span>
+
+<span class="n">samples</span><span class="p">(</span><span class="s1">'Spanish'</span><span class="p">,</span> <span class="s1">'SPA'</span><span class="p">)</span>
+
+<span class="n">samples</span><span class="p">(</span><span class="s1">'Chinese'</span><span class="p">,</span> <span class="s1">'CHI'</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Rover
+Uantovak
+Shantov
+Gerren
+Eren
+Romer
+Santaraz
+Pore
+Allan
+Chan
+Han
+Iha
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">samples</span><span class="p">(</span><span class="s1">'Korean'</span><span class="p">,</span> <span class="s1">'OEN'</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Ohon
+Eon
+Non
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+&lt;/div&gt;
+ 
+
+</eos>
+</li>
+</ul>
+</div>
+</div></div>
+</div>
+
+
+  </div><!-- from https://github.com/utterance/utterances 
+<script src="https://utteranc.es/client.js"
+        repo="Lic-Deep/testcolabblog2"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script> -->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://lic-deep.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/testcolabblog2/jupyter/deep%20learning/2021/07/06/RNN-Name-Generation.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/testcolabblog2/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/testcolabblog2/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/testcolabblog2/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>An easy to use blogging platform with support for Jupyter Notebooks.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/fastai" title="fastai"><svg class="svg-icon grey"><use xlink:href="/testcolabblog2/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/fastdotai" title="fastdotai"><svg class="svg-icon grey"><use xlink:href="/testcolabblog2/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
