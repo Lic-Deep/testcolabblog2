@@ -464,8 +464,10 @@ O'Neal
     <span class="n">loss</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">input_line_tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
-        <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">category_tensor</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hidden</span><span class="p">)</span> <span class="c1"># 하나의 문자씩 들어감</span>
-        <span class="n">l</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="c1"># 각 타임 스텝에 대한 Loss 계산</span>
+        <span class="c1"># 하나의 문자씩 들어감</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">category_tensor</span><span class="p">,</span> <span class="n">input_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">hidden</span><span class="p">)</span> 
+        <span class="c1"># 각 타임 스텝에 대한 Loss 계산</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target_line_tensor</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> 
         <span class="n">loss</span> <span class="o">+=</span> <span class="n">l</span>
 
     <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span> <span class="c1"># Loss 역전파</span>
@@ -516,7 +518,7 @@ O'Neal
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">rnn</span> <span class="o">=</span> <span class="n">RNN</span><span class="p">(</span><span class="n">n_letters</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="n">n_letters</span><span class="p">)</span> <span class="c1"># RNN(글자 Class , Hidden Size, output_size)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">rnn</span> <span class="o">=</span> <span class="n">RNN</span><span class="p">(</span><span class="n">n_letters</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="n">n_letters</span><span class="p">)</span> 
 
 <span class="n">n_iters</span> <span class="o">=</span> <span class="mi">100000</span>
 <span class="n">print_every</span> <span class="o">=</span> <span class="mi">5000</span>
@@ -666,15 +668,19 @@ O'Neal
 <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">start_letter</span><span class="o">=</span><span class="s1">'A'</span><span class="p">):</span>
     <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>  <span class="c1"># 샘플링에서 히스토리를 추적할 필요 없음</span>
         <span class="n">category_tensor</span> <span class="o">=</span> <span class="n">categoryTensor</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
-        <span class="nb">input</span> <span class="o">=</span> <span class="n">inputTensor</span><span class="p">(</span><span class="n">start_letter</span><span class="p">)</span> <span class="c1"># inputTensor : 입력을 위해 문자를 One-Hot 백터로 인코딩하는 함수</span>
-        <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="o">.</span><span class="n">initHidden</span><span class="p">()</span> <span class="c1"># 맨 처음 Time Step에 들어가기 전에만 parameter 초기화를 해줌</span>
+        <span class="c1"># inputTensor : 입력을 위해 문자를 One-Hot 백터로 인코딩하는 함수</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="n">inputTensor</span><span class="p">(</span><span class="n">start_letter</span><span class="p">)</span> 
+        <span class="c1"># 맨 처음 Time Step에 들어가기 전에만 parameter 초기화를 해줌</span>
+        <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="o">.</span><span class="n">initHidden</span><span class="p">()</span> 
 
         <span class="n">output_name</span> <span class="o">=</span> <span class="n">start_letter</span>
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_length</span><span class="p">):</span>
             <span class="n">output</span><span class="p">,</span> <span class="n">hidden</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">(</span><span class="n">category_tensor</span><span class="p">,</span> <span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">hidden</span><span class="p">)</span>
-            <span class="n">topv</span><span class="p">,</span> <span class="n">topi</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># 텐서의 가장 큰 값 및 주소 , 즉 topv은 max값, topi는 argmax 값</span>
-            <span class="n">topi</span> <span class="o">=</span> <span class="n">topi</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="c1">## 모델에서 예측한 문자의 index</span>
+            <span class="c1"># 텐서의 가장 큰 값 및 주소 , 즉 topv은 max값, topi는 argmax 값</span>
+            <span class="n">topv</span><span class="p">,</span> <span class="n">topi</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> 
+            <span class="c1"># 모델에서 예측한 문자의 index</span>
+            <span class="n">topi</span> <span class="o">=</span> <span class="n">topi</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> 
             <span class="k">if</span> <span class="n">topi</span> <span class="o">==</span> <span class="n">n_letters</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span> <span class="c1">## EOS면 종료</span>
                 <span class="k">break</span>
             <span class="k">else</span><span class="p">:</span>
