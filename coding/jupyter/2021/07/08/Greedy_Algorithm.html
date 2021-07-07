@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>그리디 알고리즘 | Teacher Forcing Student</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="그리디 알고리즘" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="주요 알고리즘 이론(3)" />
+<meta property="og:description" content="주요 알고리즘 이론(3)" />
+<link rel="canonical" href="https://lic-deep.github.io/testcolabblog2/coding/jupyter/2021/07/08/Greedy_Algorithm.html" />
+<meta property="og:url" content="https://lic-deep.github.io/testcolabblog2/coding/jupyter/2021/07/08/Greedy_Algorithm.html" />
+<meta property="og:site_name" content="Teacher Forcing Student" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-07-08T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"주요 알고리즘 이론(3)","url":"https://lic-deep.github.io/testcolabblog2/coding/jupyter/2021/07/08/Greedy_Algorithm.html","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://lic-deep.github.io/testcolabblog2/coding/jupyter/2021/07/08/Greedy_Algorithm.html"},"headline":"그리디 알고리즘","dateModified":"2021-07-08T00:00:00-05:00","datePublished":"2021-07-08T00:00:00-05:00","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/testcolabblog2/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://lic-deep.github.io/testcolabblog2/feed.xml" title="Teacher Forcing Student" /><link rel="shortcut icon" type="image/x-icon" href="/testcolabblog2/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/testcolabblog2/">Teacher Forcing Student</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/testcolabblog2/about/">About Me</a><a class="page-link" href="/testcolabblog2/gitInfo/">gitInfo</a><a class="page-link" href="/testcolabblog2/sample/">Sample</a><a class="page-link" href="/testcolabblog2/search/">Search</a><a class="page-link" href="/testcolabblog2/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">그리디 알고리즘</h1><p class="page-description">주요 알고리즘 이론(3)</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-07-08T00:00:00-05:00" itemprop="datePublished">
+        Jul 8, 2021
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      2 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/testcolabblog2/categories/#coding">coding</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/testcolabblog2/categories/#jupyter">jupyter</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/Lic-Deep/testcolabblog2/tree/master/_notebooks/2021-07-08-Greedy_Algorithm.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/testcolabblog2/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/Lic-Deep/testcolabblog2/master?filepath=_notebooks%2F2021-07-08-Greedy_Algorithm.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/testcolabblog2/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/Lic-Deep/testcolabblog2/blob/master/_notebooks/2021-07-08-Greedy_Algorithm.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/testcolabblog2/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2021-07-08-Greedy_Algorithm.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="1.-&#45817;&#51109;-&#51339;&#51008;-&#44163;&#47564;-&#49440;&#53469;&#54616;&#45716;-&#44536;&#47532;&#46356;">1. &#45817;&#51109; &#51339;&#51008; &#44163;&#47564; &#49440;&#53469;&#54616;&#45716; &#44536;&#47532;&#46356;<a class="anchor-link" href="#1.-&#45817;&#51109;-&#51339;&#51008;-&#44163;&#47564;-&#49440;&#53469;&#54616;&#45716;-&#44536;&#47532;&#46356;"> </a></h2><ul>
+<li>그리디 : 현재 상황에서 지금 당장 좋은 것만 고르는 방법</li>
+<li>사전에 외우고 있지 않아도 풀 수 있을 가능성이 높은 문제 유형</li>
+<li>특정한 문제를 만났을 때 단순히 현재 상황에서 가장 좋아 보이는 것만을 선택해도 문제를 풀 수 있는지를 파악</li>
+<li>그리디 알고리즘은 기준에 따라 좋은 것을 선택하는 알고리즘이므로 문제에서 '가장 큰 순서대로' , '가장 작은 순서대로'와 같은 기준을 알게 모르게 제시해줌</li>
+<li>대체로 이 기준은 정렬 알고맂므을 사용했을 때 만족시킬 수 있으므로, 그리디 알고리즘 문제는 자주 정렬 알고리즘과 짝을 이뤄 출제</li>
+<li>어떤 문제를 만났을 때, 바로 문제 유형을 파악하기 어렵다면 그리디 알고리즘을 의심하고, 문제를 해결할 수 있는 탐욕적인 해결법이 존재하는지 고민</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="2.-&#53360;-&#49688;&#51032;-&#48277;&#52825;">2. &#53360; &#49688;&#51032; &#48277;&#52825;<a class="anchor-link" href="#2.-&#53360;-&#49688;&#51032;-&#48277;&#52825;"> </a></h2><ul>
+<li>배열의 수를 최대 k번 연속해서 더할 수 있을 때, M번 더했을 때 가장 큰 수를 산출하는 문제</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">m</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">k</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+<span class="n">N</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+<span class="n">N</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">n</span><span class="o">%</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">n</span><span class="o">//</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">sum</span> <span class="o">=</span> <span class="n">N</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">B</span><span class="p">)</span><span class="o">*</span><span class="n">k</span> <span class="o">+</span> <span class="n">N</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">B</span> <span class="o">+</span> <span class="n">N</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span>
+<span class="c1"># 오 내가 작성한 코드가 더 효율적인 코드쓰 </span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>46
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">k</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+<span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+
+<span class="n">data</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+<span class="n">first</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">second</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">while</span> <span class="kc">True</span> <span class="p">:</span> 
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="p">:</span> 
+        <span class="k">if</span> <span class="n">m</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">result</span> <span class="o">+=</span> <span class="n">first</span>
+        <span class="n">m</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">m</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">:</span>
+        <span class="k">break</span>
+    <span class="n">result</span> <span class="o">+=</span> <span class="n">second</span>
+    <span class="n">m</span> <span class="o">-=</span> <span class="mi">1</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="3.-&#49707;&#51088;-&#52852;&#46300;-&#44172;&#51076;">3. &#49707;&#51088; &#52852;&#46300; &#44172;&#51076;<a class="anchor-link" href="#3.-&#49707;&#51088;-&#52852;&#46300;-&#44172;&#51076;"> </a></h2><ul>
+<li>N X M 배열의 숫자 카드 배열 존재</li>
+<li>각 행에서 가장 작은 수를 뽑을 때, 가장 큰 수를 뽑았을 때의 숫자를 산출</li>
+<li>즉, 각 행의 최솟 값 중 최댓값을 산출하는 문제</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">M</span><span class="p">,</span><span class="n">N</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+<span class="n">array</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">)</span> <span class="p">:</span> 
+  <span class="n">array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()))))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">array</span><span class="p">))</span>
+
+<span class="c1">## 약간 그리디 적으로 ?</span>
+<span class="n">M</span><span class="p">,</span><span class="n">N</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+<span class="n">array</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">)</span> <span class="p">:</span> 
+  <span class="n">array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">)</span> <span class="p">:</span> 
+  <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">:</span> 
+    <span class="n">num</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+  <span class="k">else</span> <span class="p">:</span> 
+    <span class="n">candidate</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">num</span> <span class="o">&lt;</span> <span class="n">candidate</span> <span class="p">:</span> 
+      <span class="n">num</span> <span class="o">=</span> <span class="n">candidate</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="4.-1&#51060;-&#46112;&#46412;&#44620;&#51648;">4. 1&#51060; &#46112;&#46412;&#44620;&#51648;<a class="anchor-link" href="#4.-1&#51060;-&#46112;&#46412;&#44620;&#51648;"> </a></h2><ul>
+<li>1이 될 때 까지 N에서 1을 빼던가, N에서 k를 나누어 줌</li>
+<li>1을 만들 때 까지 최소 반복 횟수를 산출</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">M</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+<span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">while</span> <span class="kc">True</span> <span class="p">:</span> 
+  <span class="k">if</span> <span class="n">M</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">:</span> 
+    <span class="k">break</span>
+  <span class="k">if</span> <span class="n">M</span><span class="o">%</span><span class="k">N</span> == 0 :
+    <span class="n">M</span> <span class="o">=</span> <span class="n">M</span><span class="o">/</span><span class="n">N</span>
+  <span class="k">else</span> <span class="p">:</span> 
+    <span class="n">M</span> <span class="o">-=</span> <span class="mi">1</span>
+  <span class="n">count</span> <span class="o">+=</span><span class="mi">1</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">M</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+<span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">while</span> <span class="kc">True</span> <span class="p">:</span> 
+  <span class="k">if</span> <span class="n">M</span><span class="o">%</span><span class="k">N</span> == 0 :
+    <span class="n">M</span> <span class="o">=</span> <span class="n">M</span><span class="o">/</span><span class="n">N</span>
+    <span class="n">count</span> <span class="o">+=</span><span class="mi">1</span>
+  <span class="k">else</span> <span class="p">:</span> 
+    <span class="n">minus_num</span> <span class="o">=</span> <span class="n">M</span><span class="o">%</span><span class="k">N</span>
+    <span class="n">M</span> <span class="o">-=</span> <span class="n">minus_num</span>
+    <span class="n">count</span> <span class="o">+=</span> <span class="n">minus_num</span>
+    <span class="k">if</span> <span class="n">M</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">:</span> 
+        <span class="k">break</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n</span><span class="p">,</span><span class="n">k</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+<span class="n">result</span> <span class="o">=</span> <span class="mi">0</span> 
+
+<span class="k">while</span> <span class="kc">True</span> <span class="p">:</span> 
+    <span class="n">target</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span><span class="o">//</span><span class="n">k</span><span class="p">)</span><span class="o">*</span><span class="n">k</span>
+    <span class="n">result</span> <span class="o">+=</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="n">target</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span><span class="o">&lt;</span><span class="n">k</span> <span class="p">:</span>
+        <span class="k">break</span>
+    <span class="n">result</span> <span class="o">+=</span><span class="mi">1</span>
+    <span class="n">n</span> <span class="o">//=</span> <span class="n">k</span> 
+
+<span class="n">resuult</span> <span class="o">+=</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances 
+<script src="https://utteranc.es/client.js"
+        repo="Lic-Deep/testcolabblog2"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script> -->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://lic-deep.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/testcolabblog2/coding/jupyter/2021/07/08/Greedy_Algorithm.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/testcolabblog2/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/testcolabblog2/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/testcolabblog2/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>An easy to use blogging platform with support for Jupyter Notebooks.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/fastai" title="fastai"><svg class="svg-icon grey"><use xlink:href="/testcolabblog2/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/fastdotai" title="fastdotai"><svg class="svg-icon grey"><use xlink:href="/testcolabblog2/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
