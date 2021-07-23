@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>DFS/BFS | Teacher Forcing Student</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="DFS/BFS" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="자료구조 기초/ DFS/ BFS" />
+<meta property="og:description" content="자료구조 기초/ DFS/ BFS" />
+<link rel="canonical" href="https://lic-deep.github.io/testcolabblog2/coding/jupyter/2021/07/23/DFS_BFS.html" />
+<meta property="og:url" content="https://lic-deep.github.io/testcolabblog2/coding/jupyter/2021/07/23/DFS_BFS.html" />
+<meta property="og:site_name" content="Teacher Forcing Student" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-07-23T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"자료구조 기초/ DFS/ BFS","url":"https://lic-deep.github.io/testcolabblog2/coding/jupyter/2021/07/23/DFS_BFS.html","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://lic-deep.github.io/testcolabblog2/coding/jupyter/2021/07/23/DFS_BFS.html"},"headline":"DFS/BFS","dateModified":"2021-07-23T00:00:00-05:00","datePublished":"2021-07-23T00:00:00-05:00","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/testcolabblog2/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://lic-deep.github.io/testcolabblog2/feed.xml" title="Teacher Forcing Student" /><link rel="shortcut icon" type="image/x-icon" href="/testcolabblog2/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/testcolabblog2/">Teacher Forcing Student</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/testcolabblog2/about/">About Me</a><a class="page-link" href="/testcolabblog2/gitInfo/">gitInfo</a><a class="page-link" href="/testcolabblog2/sample/">Sample</a><a class="page-link" href="/testcolabblog2/search/">Search</a><a class="page-link" href="/testcolabblog2/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">DFS/BFS</h1><p class="page-description">자료구조 기초/ DFS/ BFS</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-07-23T00:00:00-05:00" itemprop="datePublished">
+        Jul 23, 2021
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      2 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/testcolabblog2/categories/#coding">coding</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/testcolabblog2/categories/#jupyter">jupyter</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/Lic-Deep/testcolabblog2/tree/master/_notebooks/2021-07-23-DFS_BFS.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/testcolabblog2/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/Lic-Deep/testcolabblog2/master?filepath=_notebooks%2F2021-07-23-DFS_BFS.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/testcolabblog2/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/Lic-Deep/testcolabblog2/blob/master/_notebooks/2021-07-23-DFS_BFS.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/testcolabblog2/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2021-07-23-DFS_BFS.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="1.-&#44845;-&#54596;&#50836;&#54620;-&#51088;&#47308;&#44396;&#51312;-&#44592;&#52488;">1. &#44845; &#54596;&#50836;&#54620; &#51088;&#47308;&#44396;&#51312; &#44592;&#52488;<a class="anchor-link" href="#1.-&#44845;-&#54596;&#50836;&#54620;-&#51088;&#47308;&#44396;&#51312;-&#44592;&#52488;"> </a></h2><h3 id="&#53456;&#49353;-:-&#47566;&#51008;-&#50577;&#51032;-&#45936;&#51060;&#53552;-&#51473;&#50640;&#49436;-&#50896;&#54616;&#45716;-&#45936;&#51060;&#53552;&#47484;-&#52286;&#45716;-&#44284;&#51221;.">&#53456;&#49353; : &#47566;&#51008; &#50577;&#51032; &#45936;&#51060;&#53552; &#51473;&#50640;&#49436; &#50896;&#54616;&#45716; &#45936;&#51060;&#53552;&#47484; &#52286;&#45716; &#44284;&#51221;.<a class="anchor-link" href="#&#53456;&#49353;-:-&#47566;&#51008;-&#50577;&#51032;-&#45936;&#51060;&#53552;-&#51473;&#50640;&#49436;-&#50896;&#54616;&#45716;-&#45936;&#51060;&#53552;&#47484;-&#52286;&#45716;-&#44284;&#51221;."> </a></h3><ul>
+<li>프로그래밍에서는 그래프, 트리 등의 자료구조 안에서 탐색을 하는 문제를 자주 다룸
+### 자료구조 : 데이터를 표현하고 관리하고 처리하기 위한 구조</li>
+<li>스텍과 큐는 자료구조의 기초 개념으로 삽입, 삭제의 함수로 구성<ul>
+<li>삽입(Push) : 데이터를 삽입 </li>
+<li>삭제(Pop) : 데이터를 삭제</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="&#49828;&#53581;(Stack)">&#49828;&#53581;(Stack)<a class="anchor-link" href="#&#49828;&#53581;(Stack)"> </a></h3><ul>
+<li>박스 또는 책 쌓기에 비유 가능</li>
+<li>선입후출구조 또는 후입선출구조라고 함</li>
+<li>입구와 출구가 동일한 형태로 스택을 시각화할 수 있음</li>
+</ul>
+<p><img src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fby1qnT%2FbtqBE1v1UlX%2FzbnXdYnGAXhMYbcDCca6WK%2Fimg.png" alt="image" /></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<blockquote><p>Stack 구현 예제</p>
+<ul>
+<li>파이썬에서 스택을 이용할 때에는 별도의 라이브러리를 사용할 필요가 없음</li>
+<li>기본 리스트에서 append()와 pop() 메서드를 이용하면 스택 자료구조와 동일하게 동작</li>
+</ul>
+</blockquote>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">stack</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># 삽입(5)-삽입(2)-삽입(3)-삽입(7)-삭제()-삽입(1)-삽입(4)-삭제()</span>
+<span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+<span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span> <span class="c1"># 최하단 원소부터 출력</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">stack</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="c1"># 최상단 원소부터 출력</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[5, 2, 3, 1]
+[1, 3, 2, 5]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="&#53328;-(Queue)">&#53328; (Queue)<a class="anchor-link" href="#&#53328;-(Queue)"> </a></h3><ul>
+<li>큐는 놀이공원 또는 맛집의 대기 줄에 비유가능</li>
+<li>먼저 온 사람이 먼저 들어가게 됨</li>
+<li>선입선출 구조라고 함</li>
+<li>입구와 출구가 모두 뚫려 있는 터널과 같은 형태로 시각화 가능</li>
+</ul>
+<p><img src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FZce3U%2FbtqBDaOfGU5%2FRc2kR3Puqi3QiQa3o6CPL1%2Fimg.png" alt="image" /></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="&#53328;(Queue)-&#44396;&#54788;-&#50696;&#51228;">&#53328;(Queue) &#44396;&#54788; &#50696;&#51228;<a class="anchor-link" href="#&#53328;(Queue)-&#44396;&#54788;-&#50696;&#51228;"> </a></h3><ul>
+<li>파이썬으로 큐를 구현할 때는 collections 모듈에서 제공하는 deque 자료구조를 활용</li>
+<li>deque는 스택과 큐의 장점을 모두 채택한 것으로, 데이터를 넣고 빼는 속도가 리스트 자료형에 비해 효율적</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
+
+<span class="n">queue</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+
+<span class="c1"># 삽입(5)-삽입(2)-삽입(3)-삽입(7)-삭제()-삽입(1)-삽입(4)-삭제()</span>
+<span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">queue</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+<span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">queue</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">queue</span><span class="p">)</span> <span class="c1"># 먼저 들어온 순서대로 출력</span>
+<span class="n">queue</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span> <span class="c1"># 다음 출력을 위해 역순으로 바꾸기</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">queue</span><span class="p">)</span> <span class="c1"># 나중에 들어온 원소부터 출력</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>deque([3, 7, 1, 4])
+deque([4, 1, 7, 3])
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="&#51116;&#44480;-&#54632;&#49688;-(Recursive-Function)">&#51116;&#44480; &#54632;&#49688; (Recursive Function)<a class="anchor-link" href="#&#51116;&#44480;-&#54632;&#49688;-(Recursive-Function)"> </a></h3><ul>
+<li>자기 자신을 다시 호춤하는 함수를 의미 </li>
+<li>재귀 함수를 문제 풀이에서 사용할 때는 재귀 함수가 언제 끝날지, 종료 조건을 꼭 명시해야 함.</li>
+<li>종료 조건을 명시하지 않으면 함수가 무한 호출될 수 있음</li>
+<li>재귀 함수는 내부적으로 스택 자료구조와 동일</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">factorial_iterative</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="p">:</span> 
+    <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span> 
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="p">:</span> 
+        <span class="n">result</span> <span class="o">*=</span> <span class="n">i</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="c1"># 재귀적으로 구현한 n!</span>
+<span class="k">def</span> <span class="nf">factorial_recursive</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="p">:</span> 
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="p">:</span> 
+        <span class="k">return</span> <span class="mi">1</span> 
+    <span class="k">return</span> <span class="n">n</span> <span class="o">*</span> <span class="n">factorial_recursive</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;반복적으로 구현 :&#39;</span><span class="p">,</span> <span class="n">factorial_iterative</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;재귀적으로 구현 :&#39;</span><span class="p">,</span> <span class="n">factorial_recursive</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>반복적으로 구현 : 120
+재귀적으로 구현 : 120
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>반복문 대신에 재귀 함수를 사용했을 때 얻을 수 있는 장점</li>
+<li>재귀함수가 수학의 점화식(재귀식)을 그대로 소스코드로 옮겼기 때문에 재귀 함수의 코드가 더 간결<ol>
+<li>n이0혹은 1일 때 : factorial(n) = 1</li>
+<li>n이 1보다 클 때 : factorial(n) = n * factorial(n-1)</li>
+</ol>
+</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="2.-&#53456;&#49353;-&#50508;&#44256;&#47532;&#51608;-DFS-/-BFS">2. &#53456;&#49353; &#50508;&#44256;&#47532;&#51608; DFS / BFS<a class="anchor-link" href="#2.-&#53456;&#49353;-&#50508;&#44256;&#47532;&#51608;-DFS-/-BFS"> </a></h2><h3 id="DFS-(Depth-First-Search)-:-&#44618;&#51060;-&#50864;&#49440;-&#53456;&#49353;&#51060;&#46972;&#44256;&#46020;-&#48512;&#47476;&#47728;,-&#44536;&#47000;&#54532;&#50640;&#49436;-&#44618;&#51008;-&#48512;&#48516;&#51012;-&#50864;&#49440;&#51201;&#51004;&#47196;-&#53456;&#49353;&#54616;&#45716;-&#50508;&#44256;&#47532;&#51608;">DFS (Depth-First Search) : &#44618;&#51060; &#50864;&#49440; &#53456;&#49353;&#51060;&#46972;&#44256;&#46020; &#48512;&#47476;&#47728;, &#44536;&#47000;&#54532;&#50640;&#49436; &#44618;&#51008; &#48512;&#48516;&#51012; &#50864;&#49440;&#51201;&#51004;&#47196; &#53456;&#49353;&#54616;&#45716; &#50508;&#44256;&#47532;&#51608;<a class="anchor-link" href="#DFS-(Depth-First-Search)-:-&#44618;&#51060;-&#50864;&#49440;-&#53456;&#49353;&#51060;&#46972;&#44256;&#46020;-&#48512;&#47476;&#47728;,-&#44536;&#47000;&#54532;&#50640;&#49436;-&#44618;&#51008;-&#48512;&#48516;&#51012;-&#50864;&#49440;&#51201;&#51004;&#47196;-&#53456;&#49353;&#54616;&#45716;-&#50508;&#44256;&#47532;&#51608;"> </a></h3><p>그래프 : 노드(Node)와 간선(Edge)으로 표현되며 이때 노드를 정점(Vertex)라고도 말한다.</p>
+<p><img src="https://media.vlpt.us/images/gimtommang11/post/b632e2fd-4a41-4e96-b7c8-56399615308c/graph.png" alt="image" />
+그래프 탐색이란 하나의 노드를 시작으로 다수의 노드를 방문하는 것</p>
+<ul>
+<li>인접 행렬 (Adjacency Matrix) : 2차원 배열로 그래프의 연결 관계를 표현하는 방식
+  <img src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2F7RFhy%2FbtqKkOhoYiE%2FSE3IQP2q0g3xd34EQZkjM1%2Fimg.png" alt="image" /></li>
+<li>인접 리스트 (Adjacency List) : 리스트로 그래프의 연결 관계를 표현하는 방식<ul>
+<li>모든 노드에 연결된 노드에 대한 정보를 차례대로 연결하여 저장
+<img src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&amp;fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FNlh1G%2FbtqKicb2Wub%2FsHWVSS6bn2FZdijEJVR2r1%2Fimg.png" alt="image" /></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">INF</span> <span class="o">=</span> <span class="mi">999999999</span> <span class="c1"># 무한의 비용 선언</span>
+
+<span class="c1"># 2차원 리스트를 이용해 인접 행렬 표현</span>
+<span class="n">graph</span> <span class="o">=</span><span class="p">[</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">7</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">INF</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="n">INF</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[[0, 7, 5], [7, 0, 999999999], [5, 999999999, 0]]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">graph</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+<span class="c1"># 노드 0에 연결된 노드 정보 저장 (노드,거리) </span>
+<span class="n">graph</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">graph</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+
+<span class="n">graph</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">graph</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[[(1, 7), (2, 5)], [(0, 7)], [(0, 5)]]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances 
+<script src="https://utteranc.es/client.js"
+        repo="Lic-Deep/testcolabblog2"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script> -->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://lic-deep.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/testcolabblog2/coding/jupyter/2021/07/23/DFS_BFS.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/testcolabblog2/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/testcolabblog2/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/testcolabblog2/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>An easy to use blogging platform with support for Jupyter Notebooks.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/fastai" title="fastai"><svg class="svg-icon grey"><use xlink:href="/testcolabblog2/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/fastdotai" title="fastdotai"><svg class="svg-icon grey"><use xlink:href="/testcolabblog2/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
