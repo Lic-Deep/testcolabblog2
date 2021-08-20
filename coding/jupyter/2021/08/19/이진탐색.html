@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>이진 탐색 | Teacher Forcing Student</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="이진 탐색" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="이진 탐색 개념" />
+<meta property="og:description" content="이진 탐색 개념" />
+<link rel="canonical" href="https://lic-deep.github.io/testcolabblog2/coding/jupyter/2021/08/19/%EC%9D%B4%EC%A7%84%ED%83%90%EC%83%89.html" />
+<meta property="og:url" content="https://lic-deep.github.io/testcolabblog2/coding/jupyter/2021/08/19/%EC%9D%B4%EC%A7%84%ED%83%90%EC%83%89.html" />
+<meta property="og:site_name" content="Teacher Forcing Student" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-08-19T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"이진 탐색 개념","url":"https://lic-deep.github.io/testcolabblog2/coding/jupyter/2021/08/19/%EC%9D%B4%EC%A7%84%ED%83%90%EC%83%89.html","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://lic-deep.github.io/testcolabblog2/coding/jupyter/2021/08/19/%EC%9D%B4%EC%A7%84%ED%83%90%EC%83%89.html"},"headline":"이진 탐색","dateModified":"2021-08-19T00:00:00-05:00","datePublished":"2021-08-19T00:00:00-05:00","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/testcolabblog2/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://lic-deep.github.io/testcolabblog2/feed.xml" title="Teacher Forcing Student" /><link rel="shortcut icon" type="image/x-icon" href="/testcolabblog2/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/testcolabblog2/">Teacher Forcing Student</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/testcolabblog2/about/">About Me</a><a class="page-link" href="/testcolabblog2/gitInfo/">gitInfo</a><a class="page-link" href="/testcolabblog2/sample/">Sample</a><a class="page-link" href="/testcolabblog2/search/">Search</a><a class="page-link" href="/testcolabblog2/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">이진 탐색</h1><p class="page-description">이진 탐색 개념</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-08-19T00:00:00-05:00" itemprop="datePublished">
+        Aug 19, 2021
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      4 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/testcolabblog2/categories/#coding">coding</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/testcolabblog2/categories/#jupyter">jupyter</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/Lic-Deep/testcolabblog2/tree/master/_notebooks/2021-08-19-이진탐색.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/testcolabblog2/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/Lic-Deep/testcolabblog2/master?filepath=_notebooks%2F2021-08-19-%EC%9D%B4%EC%A7%84%ED%83%90%EC%83%89.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/testcolabblog2/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/Lic-Deep/testcolabblog2/blob/master/_notebooks/2021-08-19-이진탐색.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/testcolabblog2/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2021-08-19-이진탐색.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="1.&#48276;&#50948;&#47484;-&#48152;&#50473;-&#51329;&#54784;&#44032;&#45716;-&#53456;&#49353;">1.&#48276;&#50948;&#47484; &#48152;&#50473; &#51329;&#54784;&#44032;&#45716; &#53456;&#49353;<a class="anchor-link" href="#1.&#48276;&#50948;&#47484;-&#48152;&#50473;-&#51329;&#54784;&#44032;&#45716;-&#53456;&#49353;"> </a></h2><h3 id="&#49692;&#52264;-&#53456;&#49353;">&#49692;&#52264; &#53456;&#49353;<a class="anchor-link" href="#&#49692;&#52264;-&#53456;&#49353;"> </a></h3><p>* 순차 탐색 : 리스트 안에 있는 특정한 데이터를 찾기 위해서 <strong>앞에서부터 데이터를 하나씩 차례대로 확인하는 방법</strong></p>
+<p>* 보통 정렬되지 않은 리스트에서 데이터를 찾아야 할 때 사용</p>
+<p>* 순차 탐색은 데이터 정렬 여부와 상관없이 가장 앞에 있는 원소부터 하나씩 확인해야 함</p>
+<p>* 데이터 개수가 N개일 때 최대 N번의 비교 연산이 필요하므로 순차 탐색의 최악의 경우 시간 복잡도는 O(N)이다.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">sequential_search</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">array</span><span class="p">)</span> <span class="p">:</span> 
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="p">:</span> 
+        <span class="k">if</span> <span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span><span class="n">target</span> <span class="p">:</span> 
+            <span class="k">return</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;생성할 원소의 개수를 입력한 다음 한 칸 띄고 찾을 문자열을 입력하세요&#39;</span><span class="p">)</span>
+<span class="n">input_data</span> <span class="o">=</span> <span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+<span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">input_data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;앞서 적은 원소 개수만큼 문자열을 입력하세요. 구분은 띄어쓰기 한 칸으로 합니다.&#39;</span><span class="p">)</span>
+<span class="n">array</span> <span class="o">=</span> <span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">sequential_search</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">array</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>생성할 원소의 개수를 입력한 다음 한 칸 띄고 찾을 문자열을 입력하세요
+앞서 적은 원소 개수만큼 문자열을 입력하세요. 구분은 띄어쓰기 한 칸으로 합니다.
+3
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="&#51060;&#51652;-&#53456;&#49353;-:-&#48152;&#51004;&#47196;-&#51900;&#44060;&#47732;&#49436;-&#53456;&#49353;&#54616;&#44592;">&#51060;&#51652; &#53456;&#49353; : &#48152;&#51004;&#47196; &#51900;&#44060;&#47732;&#49436; &#53456;&#49353;&#54616;&#44592;<a class="anchor-link" href="#&#51060;&#51652;-&#53456;&#49353;-:-&#48152;&#51004;&#47196;-&#51900;&#44060;&#47732;&#49436;-&#53456;&#49353;&#54616;&#44592;"> </a></h3><p>* 이진 탐색은 배열 <strong>내부의 데이터가 정렬되어 있어야만 사용</strong>할 수 있는 알고리즘</p>
+<p>* 탐색 범위를 절반씩 좁혀가며 데이터를 탐색하는 특징이 있다.</p>
+<p>* 이진 탐색은 위치를 나타내는 변수 3개를 사용하는데 탐색하고자 하는 범위의 시작점, 끝점, 그리고 중간점이다.</p>
+<p>* 찾으려는 데이터와중간점 위치에 있는 데이터를 반복적으로 비교해서 원하는 데이터를 찾음</p>
+<p>* 이진 탐색은 한 번 확인할 때마다 확인하는 원소의 개수가 절반씩 줄어든다는 점에서 <strong>시간 복잡도가 O(logN)</strong>이다.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">binary_search</span><span class="p">(</span><span class="n">target</span><span class="p">,</span><span class="n">array</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">)</span> <span class="p">:</span> 
+    <span class="k">if</span> <span class="n">start</span> <span class="o">&gt;</span> <span class="n">end</span> <span class="p">:</span> 
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span><span class="o">+</span><span class="n">end</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span>
+    <span class="k">if</span> <span class="n">array</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">==</span> <span class="n">target</span> <span class="p">:</span> 
+        <span class="k">return</span> <span class="n">mid</span>
+    <span class="k">elif</span> <span class="n">array</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">target</span> <span class="p">:</span> 
+        <span class="k">return</span> <span class="n">binary_search</span><span class="p">(</span><span class="n">target</span><span class="p">,</span><span class="n">array</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">mid</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="k">return</span> <span class="n">binary_search</span><span class="p">(</span><span class="n">target</span><span class="p">,</span><span class="n">array</span><span class="p">,</span><span class="n">mid</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">end</span><span class="p">)</span>
+
+<span class="n">n</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+<span class="n">array</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">binary_search</span><span class="p">(</span><span class="n">target</span><span class="p">,</span><span class="n">array</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="kc">None</span> <span class="p">:</span> 
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;원소가 존재하지 않습니다.&#39;</span><span class="p">)</span>
+<span class="k">else</span> <span class="p">:</span> 
+    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>4
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">binary_search</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="p">:</span> 
+    <span class="k">while</span> <span class="n">start</span> <span class="o">&lt;=</span> <span class="n">end</span> <span class="p">:</span> 
+        <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span><span class="o">+</span><span class="n">end</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span>
+        <span class="k">if</span> <span class="n">array</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">==</span> <span class="n">target</span> <span class="p">:</span> 
+            <span class="k">return</span> <span class="n">mid</span>
+        <span class="k">elif</span> <span class="n">array</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">target</span><span class="p">:</span> 
+            <span class="n">end</span> <span class="o">=</span> <span class="n">mid</span><span class="o">-</span><span class="mi">1</span>
+        <span class="k">else</span> <span class="p">:</span> 
+            <span class="n">start</span> <span class="o">=</span> <span class="n">mid</span><span class="o">+</span><span class="mi">1</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+<span class="n">n</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+<span class="n">array</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">binary_search</span><span class="p">(</span><span class="n">target</span><span class="p">,</span><span class="n">array</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="kc">None</span> <span class="p">:</span> 
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;원소가 존재하지 않습니다.&#39;</span><span class="p">)</span>
+<span class="k">else</span> <span class="p">:</span> 
+    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>4
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="&#53076;&#46377;-&#53580;&#49828;&#53944;&#50640;&#49436;&#51032;-&#51060;&#51652;-&#53456;&#49353;">&#53076;&#46377; &#53580;&#49828;&#53944;&#50640;&#49436;&#51032; &#51060;&#51652; &#53456;&#49353;<a class="anchor-link" href="#&#53076;&#46377;-&#53580;&#49828;&#53944;&#50640;&#49436;&#51032;-&#51060;&#51652;-&#53456;&#49353;"> </a></h3><p>/* 이진 탐색은 코딩 테스트에서 단골로 나오는 문제이니 가급적 외우길 권함.</p>
+<p>/* 코딩 테스트의 이진 탐색 문제는 탐색 범위가 큰 상황에서의 탐색을 가정하는 문제가 많다.</p>
+<p>/* 따라서 <strong>탐색 범위가 2,000만을 넘어가면 이진 탐색으로 문제에 접근</strong>해보길 권장.</p>
+<p>/* 데이터 개수나 값이 1,000만 단위 이상으로 넘어가면 이진 탐색과 같이 O(logN)의 속도를 내야 하는 알고리즘을 떠올려야 문제를 풀 수 있는 경우가 많다는 점을 기억.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="&#53944;&#47532;-&#51088;&#47308;&#44396;&#51312;">&#53944;&#47532; &#51088;&#47308;&#44396;&#51312;<a class="anchor-link" href="#&#53944;&#47532;-&#51088;&#47308;&#44396;&#51312;"> </a></h3><p>/* 트리 자료구조는 노드와 노드의 연결로 표현하며 여기에서 노드는 정보의 단위로서 어떤한 정보를 가지고 있는 개체.</p>
+<p>/* 많은 양의 데이터를 관리하기 위한 목적으로 사용.</p>
+<p>/* 트리에서 일부를 떼어내도 트리구조이며 이를 서브트리라 함</p>
+<p>/* 트리는 파일 시스템과 같이 계층적이고 정렬된 데이터를 다루기에 적합하다.</p>
+<p><img src="https://gmlwjd9405.github.io/images/data-structure-tree/tree-terms.png" alt="image" /></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="&#51060;&#51652;-&#53456;&#49353;-&#53944;&#47532;">&#51060;&#51652; &#53456;&#49353; &#53944;&#47532;<a class="anchor-link" href="#&#51060;&#51652;-&#53456;&#49353;-&#53944;&#47532;"> </a></h3><p>/* 이진 탐색 트리 특징</p>
+<ul>
+<li>부모 노드보다 왼쪽 자식 노드가 작다.</li>
+<li>부모 노드보다 오른쪽 자식 노드가 크다. </li>
+</ul>
+<p>/* 이진 탐색 알고리즘과 같은 방식으로 타겟 값의 위치를 탐색할 수 있음</p>
+<p><img src="https://i.imgur.com/SSusVoP.png" alt="image" /></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="&#48736;&#47476;&#44172;-&#51077;&#47141;&#48155;&#44592;">&#48736;&#47476;&#44172; &#51077;&#47141;&#48155;&#44592;<a class="anchor-link" href="#&#48736;&#47476;&#44172;-&#51077;&#47141;&#48155;&#44592;"> </a></h3><p>/* 이진 탐색 문제는 입력 데이터가 많거나, 탐색 범위가 매우 넓은 편.</p>
+<p>/* 데이터의 개수가 1,000만 개를 넘어가거나 탐색 범위의 크기가 1,000억 이상이라면 이진 탐색 알고리즘 의심</p>
+<p>/* 입력 데이터가 많은 문제는 input 함수를 사용하면 동작 속도가 느려서 시간 초과로 오답 판정을 받을 수 있다.</p>
+<p>/* 입력 데이터가 많은 문제는 sys 라이브러리의 readline() 함수를 이용하면 시간 초과를 피할 수 있다.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">input_data</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="2.-&#48512;&#54408;-&#52286;&#44592;">2. &#48512;&#54408; &#52286;&#44592;<a class="anchor-link" href="#2.-&#48512;&#54408;-&#52286;&#44592;"> </a></h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">binary_search</span><span class="p">(</span><span class="n">target</span><span class="p">,</span><span class="n">array</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">)</span> <span class="p">:</span> 
+    <span class="k">while</span> <span class="n">start</span> <span class="o">&lt;=</span> <span class="n">end</span> <span class="p">:</span> 
+        <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span><span class="o">+</span><span class="n">end</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span>
+        <span class="k">if</span> <span class="n">array</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">==</span> <span class="n">target</span> <span class="p">:</span> 
+            <span class="k">return</span> <span class="n">mid</span>
+        <span class="k">elif</span> <span class="n">array</span><span class="p">[</span><span class="n">mid</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">target</span> <span class="p">:</span> 
+            <span class="n">start</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">+</span><span class="mi">1</span>
+        <span class="k">else</span> <span class="p">:</span> 
+            <span class="n">end</span> <span class="o">=</span> <span class="n">mid</span><span class="o">-</span><span class="mi">1</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+<span class="n">N</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">())</span>
+<span class="n">N_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+
+<span class="n">M</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">())</span>
+<span class="n">M_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+
+<span class="n">N_list</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+<span class="n">result</span><span class="o">=</span><span class="mi">0</span>
+<span class="k">for</span> <span class="n">com</span> <span class="ow">in</span> <span class="n">M_list</span> <span class="p">:</span> 
+    <span class="k">if</span> <span class="n">binary_search</span><span class="p">(</span><span class="n">com</span><span class="p">,</span><span class="n">N_list</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">!=</span><span class="kc">None</span> <span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;yes&#39;</span> <span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="k">else</span> <span class="p">:</span> 
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;no&#39;</span> <span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>no yes yes </pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">N_list</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[2, 3, 7, 8, 9]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">if</span> <span class="mi">4</span> <span class="ow">in</span> <span class="n">N_list</span> <span class="p">:</span> 
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;yes&#39;</span><span class="p">)</span>
+<span class="k">else</span> <span class="p">:</span> 
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;no&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>no
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="&#51665;&#54633;-&#51088;&#47308;&#54805;&#51004;&#47196;-&#54400;&#44592;">&#51665;&#54633; &#51088;&#47308;&#54805;&#51004;&#47196; &#54400;&#44592;<a class="anchor-link" href="#&#51665;&#54633;-&#51088;&#47308;&#54805;&#51004;&#47196;-&#54400;&#44592;"> </a></h3><p>/* 이 문제는 단순히 특정한 수가 한 번이라도 등장했는지를 검사하면 되므로 집합 자료형을 이용해서 문제를 해결가능.</p>
+<p>/* set() 함수는 집합 자료형을 초기화할 때 사용.</p>
+<p>/* 이러한 집합 자료형은 단순히 특정한 데이터가 존재하는지 검사할 때에 매우 효과적으로 사용할 수 있다.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">())</span>
+<span class="n">N_list</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+
+<span class="n">M</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">())</span>
+<span class="n">M_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+
+<span class="k">for</span> <span class="n">com</span> <span class="ow">in</span> <span class="n">M_list</span> <span class="p">:</span> 
+    <span class="k">if</span> <span class="n">com</span> <span class="ow">in</span> <span class="n">N_list</span> <span class="p">:</span> 
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;yes&#39;</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="k">else</span> <span class="p">:</span> 
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;no&#39;</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>no yes yes </pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">N_list</span> <span class="c1"># set함수를 사용하면 자동으로 오름차순으로 정렬. </span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{2, 3, 7, 8, 9}</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="3.-&#46497;&#48374;&#51060;-&#46497;-&#47564;&#46308;&#44592;">3. &#46497;&#48374;&#51060; &#46497; &#47564;&#46308;&#44592;<a class="anchor-link" href="#3.-&#46497;&#48374;&#51060;-&#46497;-&#47564;&#46308;&#44592;"> </a></h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">N</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+<span class="n">dduk_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+
+<span class="n">dduk_list</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+<span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">end</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">dduk_list</span><span class="p">)</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">while</span> <span class="n">start</span> <span class="o">&lt;=</span> <span class="n">end</span> <span class="p">:</span> 
+    <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span><span class="o">+</span><span class="n">end</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span>
+    
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dduk_list</span> <span class="p">:</span> 
+        <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">mid</span> <span class="p">:</span> 
+            <span class="n">total</span> <span class="o">+=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">mid</span>
+    
+
+    <span class="k">if</span> <span class="n">total</span> <span class="o">&lt;</span> <span class="n">length</span> <span class="p">:</span> 
+        <span class="n">end</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">else</span> <span class="p">:</span> 
+        <span class="n">result</span> <span class="o">=</span> <span class="n">mid</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">+</span><span class="mi">1</span> 
+
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>15
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances 
+<script src="https://utteranc.es/client.js"
+        repo="Lic-Deep/testcolabblog2"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script> -->
+
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = 'https://lic-deep.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="u-url" href="/testcolabblog2/coding/jupyter/2021/08/19/%EC%9D%B4%EC%A7%84%ED%83%90%EC%83%89.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/testcolabblog2/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/testcolabblog2/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/testcolabblog2/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>An easy to use blogging platform with support for Jupyter Notebooks.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/fastai" title="fastai"><svg class="svg-icon grey"><use xlink:href="/testcolabblog2/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/fastdotai" title="fastdotai"><svg class="svg-icon grey"><use xlink:href="/testcolabblog2/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
